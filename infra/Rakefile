@@ -1,6 +1,11 @@
+# TODO: extract into config
+VPC_ID = "vpc-8afcfce3"
+SUBNET_ID = "subnet-dd1be7b5"
+
 desc "Setup"
 task :setup do
-  sh "terraform import aws_vpc.vpc_default vpc-8afcfce3"
+  sh "terraform import aws_vpc.vpc_default #{VPC_ID}"
+  sh "terraform import aws_subnet.default_subnet #{SUBNET_ID}"
 end
 
 desc "Run"
@@ -10,7 +15,12 @@ end
 
 desc "Apply"
 task :apply do
-  sh "terraform apply"
+  sh "terraform apply --auto-approve"
+end
+
+desc "Destroy"
+task :destroy do
+  sh "tf destroy -target aws_instance.ec2-vm-1 --auto-approve"
 end
 
 task default: :run

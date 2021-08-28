@@ -1,7 +1,7 @@
 resource "aws_instance" "ec2-vm-1" {
   ami                         = "ami-0c4b99db370d5fd24"
   associate_public_ip_address = "false"
-  availability_zone           = "eu-central-1b" # TODO: extract region
+  availability_zone           = "eu-central-1a"
 
   capacity_reservation_specification {
     capacity_reservation_preference = "open"
@@ -34,14 +34,14 @@ resource "aws_instance" "ec2-vm-1" {
   root_block_device {
     delete_on_termination = "true"
     encrypted             = "false"
-    iops                  = "900"
     throughput            = "0"
     volume_size           = "300"
     volume_type           = "gp2"
+    # iops                  = "900"
   }
 
   source_dest_check      = "true"
-  subnet_id              = aws_subnet.ec2-vms-subnet-1.id
+  subnet_id              = aws_subnet.default_subnet.id
   tenancy                = "default"
   vpc_security_group_ids = [aws_security_group.ec2-vms-nsg-1.id]
   # security_groups        = ["ec2-vms-nsg-1"]
