@@ -1,0 +1,16 @@
+desc "Setup"
+task :setup do
+  sh "terraform import aws_vpc.vpc_default vpc-8afcfce3"
+end
+
+desc "Run"
+task :run do
+  sh "terraform plan"
+end
+
+desc "Apply"
+task :apply do
+  sh "terraform apply"
+end
+
+task default: :run

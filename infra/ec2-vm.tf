@@ -1,7 +1,7 @@
 resource "aws_instance" "ec2-vm-1" {
   ami                         = "ami-0c4b99db370d5fd24"
   associate_public_ip_address = "false"
-  availability_zone           = "eu-central-1b"
+  availability_zone           = "eu-central-1b" # TODO: extract region
 
   capacity_reservation_specification {
     capacity_reservation_preference = "open"
@@ -30,7 +30,6 @@ resource "aws_instance" "ec2-vm-1" {
   }
 
   monitoring = "false"
-  private_ip = "172.31.20.45"
 
   root_block_device {
     delete_on_termination = "true"
@@ -41,9 +40,11 @@ resource "aws_instance" "ec2-vm-1" {
     volume_type           = "gp2"
   }
 
-  security_groups        = ["launch-wizard-1"]
   source_dest_check      = "true"
-  subnet_id              = "${data.terraform_remote_state.subnet.outputs.ec2-vms-subnet-1}"
+  subnet_id              = aws_subnet.ec2-vms-subnet-1.id
   tenancy                = "default"
-  vpc_security_group_ids = ["${data.terraform_remote_state.sg.outputs.aws_security_group_ec2-vms-sg-1}"]
+  vpc_security_group_ids = [aws_security_group.ec2-vms-nsg-1.id]
+  # security_groups        = ["ec2-vms-nsg-1"]
+
+  # aws_security_group.env-01-sg-bas.id
 }

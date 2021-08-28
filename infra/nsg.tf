@@ -1,5 +1,5 @@
-resource "aws_security_group" "ec2-vms-sg-1" {
-  description = "expose ssh and tensorflow state"
+resource "aws_security_group" "ec2-vms-nsg-1" {
+  description = "Open SSH and Tensorflow monitoring ports"
 
   egress {
     cidr_blocks = ["0.0.0.0/0"]
@@ -25,8 +25,6 @@ resource "aws_security_group" "ec2-vms-sg-1" {
     to_port     = "6060"
   }
 
-  name = "ec2-vms-sg-1"
-
-  # TODO: configure and import vpc
+  name   = "ec2-vms-nsg-1"
   vpc_id = "vpc-8afcfce3"
 }

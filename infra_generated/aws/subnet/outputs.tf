@@ -1,4 +1,4 @@
-output "aws_subnet_tfer--subnet-002D-86d7d9fd_id" {
+output "ec2-vms-subnet-1" {
   value = "aws_subnet.tfer--subnet-002D-86d7d9fd.id"
 }
 
