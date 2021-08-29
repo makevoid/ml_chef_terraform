@@ -33,3 +33,20 @@ file "/etc/hosts" do
 end
 
 # setup ML env
+
+apt_pavkage "imagemagick"
+
+#run mogrify
+
+# convert images to tfimages
+# python dataset_tool.py create_from_images ~/datasets/metfaces ~/downloads/metfaces/images
+source_dir dest_dir
+
+
+# start training
+
+python train.py --outdir=~/training-runs --gpus=1 --data=~/datasets/custom --dry-run
+source_dir output_dir training_options
+
+# generate images from trained neural net before exiting
+#python generate.py
