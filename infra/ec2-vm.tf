@@ -1,7 +1,7 @@
 resource "aws_instance" "ec2-vm-1" {
   ami                         = "ami-0c4b99db370d5fd24"
-  associate_public_ip_address = "false"
   availability_zone           = "eu-central-1a"
+  associate_public_ip_address = "true"
 
   capacity_reservation_specification {
     capacity_reservation_preference = "open"
