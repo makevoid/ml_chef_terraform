@@ -7,9 +7,11 @@ end
 # modules
 
 include_recipe "main::module_utils"
+include_recipe "main::module_shell_cmd"
 
 class Chef::Recipe
   include Utils
+  include ShellCmd
 end
 
 class Chef::Resource::Group
