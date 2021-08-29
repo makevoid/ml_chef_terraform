@@ -48,9 +48,9 @@ module Cmd
   end
 
   def ssh_exe(cmd, stop: true, open3: true, quiet: false)
-    raise "NilHostError" unless current_host
-    ssh_user = "#{USER}@" if no_user
-    exe "ssh -T #{ssh_user}#{current_host} '#{cmd}'", stop: stop, open3: open3, quiet: quiet
+    raise "NilHostError" unless HOST_IP
+    ssh_user = "#{USER}@"
+    exe "ssh -T #{ssh_user}#{HOST_IP} '#{cmd}'", stop: stop, open3: open3, quiet: quiet
   end
 
   def ssh_file_exists(file_path)
@@ -59,8 +59,8 @@ module Cmd
   end
 
   def rsync(target_dir:, local_dir:)
-    ssh_user = "#{USER}@" if no_user
-    host = "#{ssh_user}#{current_host}"
+    ssh_user = "#{USER}@"
+    host = "#{ssh_user}#{HOST_IP}"
     # TODO: add backup via `cp` in case you use this util and you rsync in the opposite direction :)
     exe "rm -rf ./cookbooks/main/berks-cookbooks"
     rsync_status_ok = exe "rsync -r --delete --rsync-path=\"sudo rsync\" --exclude=\".git\" #{local_dir} #{host}:#{target_dir}"

@@ -1,0 +1,3 @@
+require_relative "ml_env_configuration_manager"
+
+MLConfigurationManager.run

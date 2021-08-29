@@ -2,7 +2,7 @@ require_relative "../config/env"
 
 STATE = {}
 
-class ConfigurationManager
+class MLConfigurationManager
 
   include Cmd
   include Utils
@@ -16,7 +16,7 @@ class ConfigurationManager
 
   def apply_config
     check_host
-    setup if RUN_SETUP
+    setup
     sync
     apply
   end
@@ -36,7 +36,7 @@ class ConfigurationManager
     puts " -" * 40
     # run chef-solo (chef-client, local mode) - recipes (-r) get cached - recipes overrides (-o) will skip cache
     recipe_args = "-r \"#{recipes_vendor.join ","}\" -o \"#{recipes.join ","}\""
-    ssh_exe "cd #{dir} && sudo #{chef_cli} #{recipe_args} -N #{current_host}", stop: false
+    ssh_exe "cd #{dir} && sudo #{chef_cli} #{recipe_args} -N #{HOST_IP}", stop: false
   end
 
   def install_berks_dependencies(dir:)
@@ -58,14 +58,8 @@ class ConfigurationManager
 
   private
 
-  def set_user
-    host_is_internal = current_host.include? "."
-    no_ssh_user = host_is_internal
-    set_no_user no_ssh_user
-  end
-
   def check_host
-    raise "HostNotPassedError" unless current_host
+    raise "HostNotPassedError" unless HOST_IP
   end
 
   def time_elapsed(start:)
