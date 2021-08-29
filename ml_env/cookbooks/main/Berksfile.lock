@@ -1,0 +1,15 @@
+DEPENDENCIES
+  main
+    path: .
+    metadata: true
+
+GRAPH
+  apt (7.4.0)
+  docker (7.7.3)
+  main (0.1.0)
+    docker (~> 7.7.3)
+    ssh_authorized_keys_mkv (= 1.0.3)
+    unattended-upgrades (~> 0.1.2)
+  ssh_authorized_keys_mkv (1.0.3)
+  unattended-upgrades (0.1.2)
+    apt (>= 0.0.0)

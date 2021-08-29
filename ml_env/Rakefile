@@ -1,0 +1,6 @@
+desc "Configure the ML env inside nvidia-docker"
+task :configure do
+  sh "ruby ml_env_configure.rb"
+end
+
+task default: :configure

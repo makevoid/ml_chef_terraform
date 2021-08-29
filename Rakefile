@@ -15,4 +15,11 @@ task :run do
   sh "cd infra && rake && rake apply"
 end
 
+desc "stop"
+task :stop do
+  sh "cd infra && rake destroy"
+end
+
+task destroy: :stop
+
 task default: :run

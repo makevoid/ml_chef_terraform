@@ -20,7 +20,7 @@ end
 
 desc "Destroy"
 task :destroy do
-  sh "tf destroy -target aws_instance.ec2-vm-1 --auto-approve"
+  sh "terraform destroy -target aws_instance.ec2-vm-1 --auto-approve"
 end
 
 task default: :run
