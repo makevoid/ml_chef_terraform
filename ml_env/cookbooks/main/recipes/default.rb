@@ -34,7 +34,12 @@ end
 
 # setup ML env
 
-apt_pavkage "imagemagick"
+apt_package "imagemagick"
+
+path = "/home/admin"
+images_source_dir = "#{path}/images_source"
+images_tf_dir = "#{path}/images_tf"
+output_dir = "#{path}/output"
 
 #run mogrify
 
