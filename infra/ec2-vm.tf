@@ -1,4 +1,5 @@
 resource "aws_instance" "ec2-vm-1" {
+  # Ubuntu 18 AWS ML AMI 
   ami                         = "ami-0c4b99db370d5fd24"
   availability_zone           = "eu-central-1a"
   associate_public_ip_address = "true"

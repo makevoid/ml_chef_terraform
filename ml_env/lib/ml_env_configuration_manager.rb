@@ -11,6 +11,8 @@ class MLConfigurationManager
   def run
     time = Time.now
     apply_config
+    sync_model_runner
+    sync_source_data
     puts time_elapsed start: time
   end
 
@@ -21,9 +23,20 @@ class MLConfigurationManager
     apply
   end
 
-  # copy the repo code to the target VM
+  # copy the ML Env code to the target VM
   def sync
+    rm_berks_cookbooks
     rsync_current_dir target_dir: "/home/#{USER}/provisioning"
+  end
+
+  # copy the Model Runner code to the target VM
+  def sync_model_runner
+    rsync target_dir: "/home/#{USER}/model_runner", local_dir: "../model_runner"
+  end
+
+  # copy the source data from the local data directory
+  def sync_source_data
+    rsync target_dir: "/home/#{USER}/data", local_dir: "../data"
   end
 
   def provisioning_dir
@@ -46,10 +59,13 @@ class MLConfigurationManager
   end
 
   def setup
+    chef_version = ssh_exe "chef-cli -v", stop: false
+    chef_installed = chef_version !~ /command not found/
+    return if chef_installed
     install_chef
     install_rsync
     chef_accept_license
-    setup_hostname
+    # setup_hostname # TODO
   end
 
   def self.run

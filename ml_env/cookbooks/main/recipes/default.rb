@@ -1,7 +1,7 @@
 # constants
 
 class Chef::Recipe
-
+  USER = "ubuntu"
 end
 
 # modules
@@ -34,24 +34,44 @@ end
 
 # setup ML env
 
-apt_package "imagemagick"
-
-path = "/home/admin"
-images_source_dir = "#{path}/images_source"
-images_tf_dir = "#{path}/images_tf"
-output_dir = "#{path}/output"
-
-#run mogrify
-
-# convert images to tfimages
-# python dataset_tool.py create_from_images ~/datasets/metfaces ~/downloads/metfaces/images
-source_dir dest_dir
 
 
-# start training
+module MLUtils
+  def exe(program, *args)
+    system "#{program} #{args.join(' ')}"
+  end
 
-python train.py --outdir=~/training-runs --gpus=1 --data=~/datasets/custom --dry-run
-source_dir output_dir training_options
+  def python(program, *args)
+    exe "python", program, *args
+  end
+end
 
-# generate images from trained neural net before exiting
-#python generate.py
+# StyleGAN 2 model utils
+module MLModelUtils
+  def create_tf_records(images_source_dir:, images_tf_dir:)
+    python "dataset_tool.py", "create_from_images", images_tf_dir, images_source_dir
+  end
+end
+
+class Chef::Resource::RubyBlock
+  include MLUtils
+  include MLModelUtils
+end
+
+ruby_block 'setup docker swarm' do
+  block do
+    path = "/home/#{USER}/data"
+    images_source_dir = "#{path}/images_source"
+    images_tf_dir = "#{path}/images_tf"
+    output_dir = "#{path}/output"
+
+    create_tf_records images_source_dir: images_source_dir, images_tf_dir: images_tf_dir
+  end
+end
+
+
+# imagemagick is already present
+# apt_package "imagemagick"
+
+# rsync model runner
+# run model runner

@@ -58,11 +58,14 @@ module Cmd
     !status_ok # ?
   end
 
+  def rm_berks_cookbooks
+    exe "rm -rf ./cookbooks/main/berks-cookbooks"
+  end
+
   def rsync(target_dir:, local_dir:)
     ssh_user = "#{USER}@"
     host = "#{ssh_user}#{HOST_IP}"
     # TODO: add backup via `cp` in case you use this util and you rsync in the opposite direction :)
-    exe "rm -rf ./cookbooks/main/berks-cookbooks"
     rsync_status_ok = exe "rsync -r --delete --rsync-path=\"sudo rsync\" --exclude=\".git\" #{local_dir} #{host}:#{target_dir}"
     chown_status_ok = ssh_exe "sudo chown #{USER}:#{USER} -R #{target_dir}"
     rsync_status_ok && chown_status_ok
