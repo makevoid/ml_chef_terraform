@@ -25,6 +25,6 @@ resource "aws_security_group" "ec2-vms-nsg-1" {
     to_port     = "6060"
   }
 
-  name   = "ec2-vms-nsg-1"
+  #name   = "ec2-vms-nsg-1"
   vpc_id = "vpc-8afcfce3"
 }

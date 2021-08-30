@@ -10,9 +10,9 @@ class MLConfigurationManager
 
   def run
     time = Time.now
+    sync_source_data
     apply_config
     sync_model_runner
-    sync_source_data
     puts time_elapsed start: time
   end
 
@@ -26,7 +26,9 @@ class MLConfigurationManager
   # copy the ML Env code to the target VM
   def sync
     rm_berks_cookbooks
-    rsync_current_dir target_dir: "/home/#{USER}/provisioning"
+    target_dir = "/home/#{USER}/provisioning"
+    rsync_current_dir target_dir: target_dir
+    ssh_exe "sudo chown #{USER}:#{USER} -R #{target_dir}"
   end
 
   # copy the Model Runner code to the target VM

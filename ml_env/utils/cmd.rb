@@ -67,8 +67,7 @@ module Cmd
     host = "#{ssh_user}#{HOST_IP}"
     # TODO: add backup via `cp` in case you use this util and you rsync in the opposite direction :)
     rsync_status_ok = exe "rsync -r --delete --rsync-path=\"sudo rsync\" --exclude=\".git\" #{local_dir} #{host}:#{target_dir}"
-    chown_status_ok = ssh_exe "sudo chown #{USER}:#{USER} -R #{target_dir}"
-    rsync_status_ok && chown_status_ok
+    rsync_status_ok 
   end
 
   def rsync_current_dir(target_dir:)

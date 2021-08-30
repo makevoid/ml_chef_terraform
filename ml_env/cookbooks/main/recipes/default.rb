@@ -1,7 +1,12 @@
 # constants
 
 class Chef::Recipe
-  USER = "ubuntu"
+  module Constants
+    USER = "ubuntu"
+    DOCKER_USER = "stylegan2-ada"
+  end
+
+  include Constants
 end
 
 # modules
@@ -37,12 +42,29 @@ end
 
 
 module MLUtils
+  include Chef::Recipe::Constants
+  def nvidia_docker(command)
+    "nvidia-docker run -u $(id -u):$(id -g) -v /home/#{USER}/data:/home/#{DOCKER_USER}/data --device /dev/nvidia0:/dev/nvidia0 --device /dev/nvidiactl:/dev/nvidiactl makevoid/stylegan2 \"#{command}\""
+  end
+
   def exe(program, *args)
-    system "#{program} #{args.join(' ')}"
+    cmd = "#{program} #{args.join(' ')}"
+    puts "executing: #{cmd}"
+    out = `#{cmd}`
+    puts out
+    out
+  end
+
+  def nv_exe(program, *args)
+    cmd = nvidia_docker "#{program} #{args.join(' ')}"
+    puts "executing: #{cmd}"
+    out = `#{cmd}`
+    puts out
+    out
   end
 
   def python(program, *args)
-    exe "python", program, *args
+    nv_exe "/usr/local/bin/python", program, *args
   end
 end
 
@@ -58,17 +80,17 @@ class Chef::Resource::RubyBlock
   include MLModelUtils
 end
 
-ruby_block 'setup docker swarm' do
+ruby_block 'create TF records' do
   block do
-    path = "/home/#{USER}/data"
-    images_source_dir = "#{path}/images_source"
+    path = "/home/#{DOCKER_USER}/data"
+    images_source_dir = "#{path}/data/images_source" #TODO:fixme
     images_tf_dir = "#{path}/images_tf"
     output_dir = "#{path}/output"
 
+    puts "Create TF records"
     create_tf_records images_source_dir: images_source_dir, images_tf_dir: images_tf_dir
   end
 end
-
 
 # imagemagick is already present
 # apt_package "imagemagick"
