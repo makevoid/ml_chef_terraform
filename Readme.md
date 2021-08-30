@@ -2,7 +2,6 @@
 
 #### Machine Learning Chef Terraform AWS Configuration Manager / Environment Configurator
 
----
 
 nvidia docker stylegan2 execution example included
 
