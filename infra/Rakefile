@@ -8,6 +8,8 @@ task :setup do
   sh "terraform import aws_subnet.default_subnet #{SUBNET_ID}"
 end
 
+# TODO: force the location of plan file
+
 desc "Run"
 task :run do
   sh "terraform plan"
