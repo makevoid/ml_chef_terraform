@@ -1,8 +1,10 @@
-# ml_chef_terraform
+# ML Chef Terraform AWS Setup
 
-Chef + Terraform AWS ML Setup
+#### Machine Learning Chef Terraform AWS Configuration Manager / Environment Configurator
 
-nvidia docker stylegan execution example included
+---
+
+nvidia docker stylegan2 execution example included
 
 default config:
 
