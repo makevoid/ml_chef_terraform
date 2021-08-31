@@ -1,5 +1,11 @@
 PATH = File.expand_path "../", __FILE__
 
+vm_ip = File.read "#{PATH}/../infra/outputs/vm_1_public_ip.txt"
+vm_ip.strip!
+VM_IP = vm_ip
+
+USER = "ubuntu"
+
 desc "Configure the ML env inside nvidia-docker"
 task :configure do
   sh "ruby lib/ml_env_configure.rb"
@@ -7,9 +13,14 @@ end
 
 desc "ssh into the machine"
 task :ssh do
-  vm_ip = File.read "#{PATH}/../infra/outputs/vm_1_public_ip.txt"
-  vm_ip.strip!
   sh "ssh ubuntu@#{vm_ip}"
 end
+
+desc "Download data to local machine"
+task :download do
+  sh "scp -r #{USER}@#{VM_IP}:/home/#{USER}/data/output ../data/output"
+end
+
+task dl: :download
 
 task default: :configure

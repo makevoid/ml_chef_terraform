@@ -12,7 +12,7 @@ class MLConfigurationManager
     time = Time.now
     sync_source_data
     apply_config
-    sync_model_runner
+    # sync_model_runner
     puts time_elapsed start: time
   end
 
@@ -31,10 +31,10 @@ class MLConfigurationManager
     ssh_exe "sudo chown #{USER}:#{USER} -R #{target_dir}"
   end
 
-  # copy the Model Runner code to the target VM
-  def sync_model_runner
-    rsync target_dir: "/home/#{USER}/model_runner", local_dir: "../model_runner"
-  end
+  # # copy the Model Runner code to the target VM
+  # def sync_model_runner
+  #   rsync target_dir: "/home/#{USER}/model_runner", local_dir: "../model_runner"
+  # end
 
   # copy the source data from the local data directory
   def sync_source_data

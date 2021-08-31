@@ -44,9 +44,10 @@ end
 module MLUtils
   include Chef::Recipe::Constants
   def nvidia_docker(command)
-    "nvidia-docker run -u $(id -u):$(id -g) -v /home/#{USER}/data:/home/#{DOCKER_USER}/data --device /dev/nvidia0:/dev/nvidia0 --device /dev/nvidiactl:/dev/nvidiactl makevoid/stylegan2 \"#{command}\""
+    "nvidia-docker run -u $(id -u):$(id -g) -v /home/#{USER}/data:/home/#{DOCKER_USER}/data --device /dev/nvidia0:/dev/nvidia0 --device /dev/nvidiactl:/dev/nvidiactl makevoid/stylegan2 #{command}"
   end
 
+  # TODO: replace with popen3 for live output capturing
   def exe(program, *args)
     cmd = "#{program} #{args.join(' ')}"
     puts "executing: #{cmd}"
@@ -55,12 +56,36 @@ module MLUtils
     out
   end
 
+  def exe_async(cmd, stop: false, quiet: false)
+    output = ""
+    Open3.popen3(cmd) do |stdin, stdout, stderr, process|
+      t1 = Thread.new do
+        until (line = stdout.gets).nil? do
+          puts line unless quiet
+          output << line
+        end
+      end
+      t2 = Thread.new do
+        until (line = stderr.gets).nil? do
+          puts line
+          output << line
+        end
+      end
+      [t1, t2].each{ |thr| thr.join }
+      # process.join
+      exit_status = process.value
+      unless exit_status.success?
+        puts "ERROR: command failed - command: #{cmd.inspect}"
+        raise "ErrorCommandFailure" if stop
+      end
+    end
+    output
+  end
+
   def nv_exe(program, *args)
     cmd = nvidia_docker "#{program} #{args.join(' ')}"
     puts "executing: #{cmd}"
-    out = `#{cmd}`
-    puts out
-    out
+    exe_async cmd
   end
 
   def python(program, *args)
@@ -70,8 +95,20 @@ end
 
 # StyleGAN 2 model utils
 module MLModelUtils
+  # IMAGE_SIZE = "128"
+  IMAGE_SIZE = "256"
+
   def create_tf_records(images_source_dir:, images_tf_dir:)
     python "dataset_tool.py", "create_from_images", images_tf_dir, images_source_dir
+  end
+
+  def convert_images(images_source_dir:, images_conv_dir:)
+    exe "mkdir -p #{images_conv_dir}"
+    exe "mogrify  -resize #{IMAGE_SIZE}x#{IMAGE_SIZE}! -path #{images_conv_dir} #{images_source_dir}/*.jpg"
+  end
+
+  def train(images_tf_dir:, output_dir:)
+    python "train.py", "--gpus=1", "--outdir=#{output_dir}", "--data=#{images_tf_dir}", "--kimg 1000 --cfg=stylegan2 --metrics=none --aug=ada --augpipe=bgc --snap=12 --gamma=4"
   end
 end
 
@@ -80,20 +117,35 @@ class Chef::Resource::RubyBlock
   include MLModelUtils
 end
 
+# mogrify / convert tool
+apt_package "imagemagick"
+
 ruby_block 'create TF records' do
   block do
     path = "/home/#{DOCKER_USER}/data"
-    images_source_dir = "#{path}/data/images_source" #TODO:fixme
-    images_tf_dir = "#{path}/images_tf"
+    path_local = "/home/#{USER}/data"
+    images_source_dir = "#{path}/data/images_sources"
+    images_conv_dir   = "#{path}/images_conv"
+    images_tf_dir     = "#{path}/images_tf"
     output_dir = "#{path}/output"
 
-    puts "Create TF records"
-    create_tf_records images_source_dir: images_source_dir, images_tf_dir: images_tf_dir
+    images_source_dir_local = "#{path_local}/data/images_sources"
+    images_conv_dir_local   = "#{path_local}/images_conv"
+    images_tf_dir_local     =  "#{path_local}/images_tf"
+
+
+    unless Dir.exists? images_tf_dir_local
+      puts "Create TF records"
+
+      convert_images images_source_dir: images_source_dir_local, images_conv_dir: images_conv_dir_local
+      create_tf_records images_source_dir: images_conv_dir, images_tf_dir: images_tf_dir
+    end
+
+    train images_tf_dir: images_tf_dir, output_dir: output_dir
   end
 end
 
 # imagemagick is already present
-# apt_package "imagemagick"
 
 # rsync model runner
 # run model runner
