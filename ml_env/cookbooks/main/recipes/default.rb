@@ -43,8 +43,12 @@ end
 
 module MLUtils
   include Chef::Recipe::Constants
+
+  TAG = "latest" # normal run
+  # TAG = "resume1" # resume from previous model - requires you to build your custom stylegan2 image - repo with docker-compose.yml to do so here: https://github.com/makevoid/stylegan2-ada - command: docker-compose build && docker-compose push (requires a dockerhub account + docker login)
+
   def nvidia_docker(command)
-    "nvidia-docker run -u $(id -u):$(id -g) -v /home/#{USER}/data:/home/#{DOCKER_USER}/data --device /dev/nvidia0:/dev/nvidia0 --device /dev/nvidiactl:/dev/nvidiactl makevoid/stylegan2 #{command}"
+    "nvidia-docker run -u $(id -u):$(id -g) -v /home/#{USER}/data:/home/#{DOCKER_USER}/data --device /dev/nvidia0:/dev/nvidia0 --device /dev/nvidiactl:/dev/nvidiactl makevoid/stylegan2:#{TAG} #{command}"
   end
 
   # TODO: replace with popen3 for live output capturing
@@ -72,7 +76,7 @@ module MLUtils
         end
       end
       [t1, t2].each{ |thr| thr.join }
-      # process.join
+      process.join
       exit_status = process.value
       unless exit_status.success?
         puts "ERROR: command failed - command: #{cmd.inspect}"
@@ -98,6 +102,9 @@ module MLModelUtils
   # IMAGE_SIZE = "128"
   IMAGE_SIZE = "256"
 
+  # KIMG = "1000"
+  KIMG = "3000"
+
   def create_tf_records(images_source_dir:, images_tf_dir:)
     python "dataset_tool.py", "create_from_images", images_tf_dir, images_source_dir
   end
@@ -108,7 +115,7 @@ module MLModelUtils
   end
 
   def train(images_tf_dir:, output_dir:)
-    python "train.py", "--gpus=1", "--outdir=#{output_dir}", "--data=#{images_tf_dir}", "--kimg 1000 --cfg=stylegan2 --metrics=none --aug=ada --augpipe=bgc --snap=12 --gamma=4"
+    python "train.py", "--gpus 1", "--outdir #{output_dir}", "--data #{images_tf_dir}", "--kimg #{KIMG} --cfg stylegan2 --metrics none --aug ada --augpipe bgc --snap 12 --gamma 4"
   end
 end
 
@@ -140,6 +147,9 @@ ruby_block 'create TF records' do
       convert_images images_source_dir: images_source_dir_local, images_conv_dir: images_conv_dir_local
       create_tf_records images_source_dir: images_conv_dir, images_tf_dir: images_tf_dir
     end
+
+    # puts "data dir contents:"
+    # exe "ls #{path_local}"
 
     train images_tf_dir: images_tf_dir, output_dir: output_dir
   end
