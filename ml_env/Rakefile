@@ -21,6 +21,22 @@ task :download do
   sh "scp -r #{USER}@#{VM_IP}:/home/#{USER}/data/output ../data/output"
 end
 
+RUN_ID = "00002-images_tf-stylegan2-gamma4-kimg1000-ada-bgc"
+
+desc "Download data to local machine - fakes images only"
+task :download_fakes do
+  sh "scp -r #{USER}@#{VM_IP}:/home/#{USER}/data/output/#{RUN_ID}/*.png ../data/output"
+end
+
+desc "Download data to local machine - latest model only"
+task :download_model do
+  dir_run = "/home/#{USER}/data/output/#{RUN_ID}"
+  model_file = `ssh #{USER}@#{VM_IP} ls -t #{dir_run}/*.pkl | head -1`
+  model_file.strip!
+  puts "executing: #{model_file}"
+  sh "scp -r #{USER}@#{VM_IP}:#{model_file} ../data/output"
+end
+
 task dl: :download
 
 task default: :configure
