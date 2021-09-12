@@ -50,6 +50,7 @@ module MLUtils
   def nvidia_docker(command)
     "nvidia-docker run -u $(id -u):$(id -g) -v /home/#{USER}/data:/home/#{DOCKER_USER}/data --device /dev/nvidia0:/dev/nvidia0 --device /dev/nvidiactl:/dev/nvidiactl makevoid/stylegan2:#{TAG} #{command}"
   end
+  # nvidia-docker pull makevoid/stylegan2:latest
 
   # TODO: replace with popen3 for live output capturing
   def exe(program, *args)
@@ -105,6 +106,10 @@ module MLModelUtils
   # KIMG = "1000"
   KIMG = "3000"
 
+  # SNAPSHOTS = 2
+  GAMMA = 10
+  # GAMMA = 8
+
   def create_tf_records(images_source_dir:, images_tf_dir:)
     python "dataset_tool.py", "create_from_images", images_tf_dir, images_source_dir
   end
@@ -115,7 +120,9 @@ module MLModelUtils
   end
 
   def train(images_tf_dir:, output_dir:)
-    python "train.py", "--gpus 1", "--outdir #{output_dir}", "--data #{images_tf_dir}", "--kimg #{KIMG} --cfg stylegan2 --metrics none --aug ada --augpipe bgc --snap 12 --gamma 4"
+    # snap = "--snap #{SNAPSHOTS}"
+    snap = ""
+    python "train.py", "--gpus 1", "--outdir #{output_dir}", "--data #{images_tf_dir}", "--kimg #{KIMG} --cfg stylegan2 --metrics none --aug ada --augpipe bgc --gamma #{GAMMA} #{snap}"
   end
 end
 
