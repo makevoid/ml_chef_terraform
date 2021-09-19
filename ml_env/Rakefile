@@ -1,10 +1,19 @@
 PATH = File.expand_path "../", __FILE__
 
-vm_ip = File.read "#{PATH}/../infra/outputs/vm_1_public_ip.txt"
-vm_ip.strip!
-VM_IP = vm_ip
+DEFAULT_IP = nil
+# DEFAULT_IP = "207.53.234.147"
 
 USER = "ubuntu"
+# USER = "user"
+
+vm_ip = unless DEFAULT_IP
+  ip = File.read "#{PATH}/../infra/outputs/vm_1_public_ip.txt"
+  ip.strip!
+else
+  DEFAULT_IP
+end
+
+VM_IP = vm_ip
 
 desc "Configure the ML env inside nvidia-docker"
 task :configure do
@@ -13,7 +22,7 @@ end
 
 desc "ssh into the machine"
 task :ssh do
-  sh "ssh ubuntu@#{vm_ip}"
+  sh "ssh #{USER}@#{vm_ip}"
 end
 
 desc "Download data to local machine"
@@ -21,7 +30,7 @@ task :download do
   sh "scp -r #{USER}@#{VM_IP}:/home/#{USER}/data/output ../data/output"
 end
 
-RUN_ID = "00000-images_tf-stylegan2-gamma10-kimg3000-ada-bgc"
+RUN_ID = "00000-images_tf-mirror-stylegan2-gamma10-kimg1000-ada-bgc"
 
 desc "Download data to local machine - fakes images only"
 task :download_fakes do
@@ -37,9 +46,29 @@ task :download_model do
   sh "scp -r #{USER}@#{VM_IP}:#{model_file} ../data/output"
 end
 
+
+desc "Download data to local machine - latest fake only"
+task :download_fake do
+  dir_run = "/home/#{USER}/data/output/#{RUN_ID}"
+  model_file = `ssh #{USER}@#{VM_IP} ls -t #{dir_run}/*.png | head -1`
+  model_file.strip!
+  puts "executing: #{model_file}"
+  sh "scp -r #{USER}@#{VM_IP}:#{model_file} ../data/output"
+end
+
+desc "Download data to local machine - fakes images only"
+task :download_run_fakes do
+  sh "scp -r #{USER}@#{VM_IP}:/home/#{USER}/data/output/#{RUN_ID}r /*.png ../data/output"
+end
+
+desc "Nvidia Stats"
+task :stats do
+  sh "ssh #{USER}@#{VM_IP} nvidia-smi"
+end
+
 desc "Logs"
 task :logs do
-  sh "ssh #{USER}@#{VM_IP} docker logs -f $(ssh #{USER}@#{VM_IP} docker ps | grep stylegan2 | cut -d \" \" -f1) 2>&1"
+  sh "ssh #{USER}@#{VM_IP} sudo docker logs -f $(ssh #{USER}@#{VM_IP} sudo docker ps | grep stylegan2 | cut -d \" \" -f1) 2>&1"
 end
 
 desc "List - Look at the data directory content"

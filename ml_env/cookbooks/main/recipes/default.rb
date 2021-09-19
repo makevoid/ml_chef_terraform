@@ -3,6 +3,7 @@
 class Chef::Recipe
   module Constants
     USER = "ubuntu"
+    # USER = "user"
     DOCKER_USER = "stylegan2-ada"
   end
 
@@ -45,12 +46,13 @@ module MLUtils
   include Chef::Recipe::Constants
 
   TAG = "latest" # normal run
-  # TAG = "resume1" # resume from previous model - requires you to build your custom stylegan2 image - repo with docker-compose.yml to do so here: https://github.com/makevoid/stylegan2-ada - command: docker-compose build && docker-compose push (requires a dockerhub account + docker login)
+  TAG = "resume1" # resume from previous model - requires you to build your custom stylegan2 image - repo with docker-compose.yml to do so here: https://github.com/makevoid/stylegan2-ada - command: docker-compose build && docker-compose push (requires a dockerhub account + docker login)
 
   def nvidia_docker(command)
     "nvidia-docker run -u $(id -u):$(id -g) -v /home/#{USER}/data:/home/#{DOCKER_USER}/data --device /dev/nvidia0:/dev/nvidia0 --device /dev/nvidiactl:/dev/nvidiactl makevoid/stylegan2:#{TAG} #{command}"
   end
   # nvidia-docker pull makevoid/stylegan2:latest
+  # nvidia-docker pull makevoid/stylegan2:resume1
 
   # TODO: replace with popen3 for live output capturing
   def exe(program, *args)
@@ -101,28 +103,36 @@ end
 # StyleGAN 2 model utils
 module MLModelUtils
   # IMAGE_SIZE = "128"
-  IMAGE_SIZE = "256"
+  # IMAGE_SIZE = "256"
+  # IMAGE_SIZE = "512"
+  IMAGE_SIZE = "1024"
 
   # KIMG = "1000"
-  KIMG = "3000"
+  KIMG = "1000"
 
   # SNAPSHOTS = 2
+  # GAMMA = 10
   GAMMA = 10
-  # GAMMA = 8
+
+  GPUS = 1
+
+  IMAGES_FILE_EXTENSION = "png"
+  # IMAGES_FILE_EXTENSION = "jpg"
 
   def create_tf_records(images_source_dir:, images_tf_dir:)
     python "dataset_tool.py", "create_from_images", images_tf_dir, images_source_dir
   end
 
   def convert_images(images_source_dir:, images_conv_dir:)
+    ext = IMAGES_FILE_EXTENSION
     exe "mkdir -p #{images_conv_dir}"
-    exe "mogrify  -resize #{IMAGE_SIZE}x#{IMAGE_SIZE}! -path #{images_conv_dir} #{images_source_dir}/*.jpg"
+    exe "mogrify -format jpg -colorspace sRGB -type truecolor -resize #{IMAGE_SIZE}x#{IMAGE_SIZE}! -path #{images_conv_dir} #{images_source_dir}/*.#{ext}"
   end
 
   def train(images_tf_dir:, output_dir:)
     # snap = "--snap #{SNAPSHOTS}"
     snap = ""
-    python "train.py", "--gpus 1", "--outdir #{output_dir}", "--data #{images_tf_dir}", "--kimg #{KIMG} --cfg stylegan2 --metrics none --aug ada --augpipe bgc --gamma #{GAMMA} #{snap}"
+    python "train.py", "--gpus #{GPUS}", "--outdir #{output_dir}", "--data #{images_tf_dir}", "--kimg #{KIMG} --cfg stylegan2 --metrics none --aug ada --augpipe bgc --gamma #{GAMMA} --mirror 1 #{snap}"
   end
 end
 
@@ -155,14 +165,6 @@ ruby_block 'create TF records' do
       create_tf_records images_source_dir: images_conv_dir, images_tf_dir: images_tf_dir
     end
 
-    # puts "data dir contents:"
-    # exe "ls #{path_local}"
-
     train images_tf_dir: images_tf_dir, output_dir: output_dir
   end
 end
-
-# imagemagick is already present
-
-# rsync model runner
-# run model runner
