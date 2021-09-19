@@ -3,3 +3,4 @@ data-bak/*
 *.tfstate
 ml_env/.rake_tasks~
 *.swp
+.DS_Store
