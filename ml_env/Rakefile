@@ -1,10 +1,10 @@
 PATH = File.expand_path "../", __FILE__
 
-DEFAULT_IP = nil
-# DEFAULT_IP = "207.53.234.147"
+# DEFAULT_IP = nil
+DEFAULT_IP = "207.53.234.147"
 
-USER = "ubuntu"
-# USER = "user"
+# USER = "ubuntu"
+USER = "user"
 
 vm_ip = unless DEFAULT_IP
   ip = File.read "#{PATH}/../infra/outputs/vm_1_public_ip.txt"
