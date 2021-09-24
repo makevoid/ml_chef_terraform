@@ -1,5 +1,4 @@
 module Chef::Recipe::Utils
-
   def node_name
     node.name
   end
@@ -12,5 +11,4 @@ module Chef::Recipe::Utils
   def current_host
     node.name
   end
-
 end

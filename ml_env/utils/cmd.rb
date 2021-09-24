@@ -1,8 +1,7 @@
-require 'open3'
+require "open3"
 Thread.abort_on_exception = true
 
 module Cmd
-
   def exe(cmd, stop: true, open3: true, quiet: false)
     puts "executing: #{cmd}"
     unless open3
@@ -25,18 +24,18 @@ module Cmd
     output = ""
     Open3.popen3(cmd) do |stdin, stdout, stderr, process|
       t1 = Thread.new do
-        until (line = stdout.gets).nil? do
+        until (line = stdout.gets).nil?
           puts line unless quiet
           output << line
         end
       end
       t2 = Thread.new do
-        until (line = stderr.gets).nil? do
+        until (line = stderr.gets).nil?
           puts line
           output << line
         end
       end
-      [t1, t2].each{ |thr| thr.join }
+      [t1, t2].each { |thr| thr.join }
       # process.join
       exit_status = process.value
       unless exit_status.success?
@@ -66,13 +65,11 @@ module Cmd
     ssh_user = "#{USER}@"
     host = "#{ssh_user}#{HOST_IP}"
     # TODO: add backup via `cp` in case you use this util and you rsync in the opposite direction :)
-    rsync_status_ok = exe "rsync -r --delete --rsync-path=\"sudo rsync\" --exclude=\".git\" #{local_dir} #{host}:#{target_dir}"
-    rsync_status_ok 
+    exe "rsync -r --delete --rsync-path=\"sudo rsync\" --exclude=\".git\" #{local_dir} #{host}:#{target_dir}"
   end
 
   def rsync_current_dir(target_dir:)
     local_dir = "."
     rsync target_dir: target_dir, local_dir: local_dir
   end
-
 end

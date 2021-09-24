@@ -46,7 +46,6 @@ task :download_model do
   sh "scp -r #{USER}@#{VM_IP}:#{model_file} ../data/output"
 end
 
-
 desc "Download data to local machine - latest fake only"
 task :download_fake do
   dir_run = "/home/#{USER}/data/output/#{RUN_ID}"

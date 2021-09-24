@@ -1,5 +1,5 @@
-RECIPES_VENDOR = %w(
-)
+RECIPES_VENDOR = %w[
+]
 
 RECIPES = %w(
   recipe[main]

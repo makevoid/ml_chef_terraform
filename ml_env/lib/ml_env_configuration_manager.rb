@@ -1,9 +1,8 @@
 require_relative "../config/env"
 
-STATE = {}
+STATE = { }
 
 class MLConfigurationManager
-
   include Cmd
   include Utils
   include Setup
@@ -83,5 +82,4 @@ class MLConfigurationManager
   def time_elapsed(start:)
     "Configuration done in #{(Time.now - start).round 2}s"
   end
-
 end

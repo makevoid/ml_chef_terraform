@@ -1,5 +1,4 @@
 module Utils
-
   def chef_cli
     "chef-client --local-mode"
   end
@@ -19,5 +18,4 @@ module Utils
   def current_host
     STATE[:host]
   end
-
 end

@@ -1,5 +1,4 @@
 module Setup
-
   def install_chef
     ssh_exe "curl -L https://omnitruck.chef.io/install.sh | sudo bash  -s -- -v #{CHEF_VERSION} -P chef-workstation -s -c stable", stop: true
   end
@@ -17,5 +16,4 @@ module Setup
   def setup_hostname
     ssh_exe "sudo hostnamectl set-hostname #{current_host}"
   end
-
 end

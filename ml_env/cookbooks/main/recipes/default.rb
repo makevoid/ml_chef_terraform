@@ -40,8 +40,6 @@ end
 
 # setup ML env
 
-
-
 module MLUtils
   include Chef::Recipe::Constants
 
@@ -56,7 +54,7 @@ module MLUtils
 
   # TODO: replace with popen3 for live output capturing
   def exe(program, *args)
-    cmd = "#{program} #{args.join(' ')}"
+    cmd = "#{program} #{args.join(" ")}"
     puts "executing: #{cmd}"
     out = `#{cmd}`
     puts out
@@ -67,18 +65,18 @@ module MLUtils
     output = ""
     Open3.popen3(cmd) do |stdin, stdout, stderr, process|
       t1 = Thread.new do
-        until (line = stdout.gets).nil? do
+        until (line = stdout.gets).nil?
           puts line unless quiet
           output << line
         end
       end
       t2 = Thread.new do
-        until (line = stderr.gets).nil? do
+        until (line = stderr.gets).nil?
           puts line
           output << line
         end
       end
-      [t1, t2].each{ |thr| thr.join }
+      [t1, t2].each { |thr| thr.join }
       process.join
       exit_status = process.value
       unless exit_status.success?
@@ -90,7 +88,7 @@ module MLUtils
   end
 
   def nv_exe(program, *args)
-    cmd = nvidia_docker "#{program} #{args.join(' ')}"
+    cmd = nvidia_docker "#{program} #{args.join(" ")}"
     puts "executing: #{cmd}"
     exe_async cmd
   end
@@ -144,7 +142,7 @@ end
 # mogrify / convert tool
 apt_package "imagemagick"
 
-ruby_block 'create TF records' do
+ruby_block "create TF records" do
   block do
     path = "/home/#{DOCKER_USER}/data"
     path_local = "/home/#{USER}/data"
@@ -155,10 +153,9 @@ ruby_block 'create TF records' do
 
     images_source_dir_local = "#{path_local}/data/images_sources"
     images_conv_dir_local   = "#{path_local}/images_conv"
-    images_tf_dir_local     =  "#{path_local}/images_tf"
+    images_tf_dir_local = "#{path_local}/images_tf"
 
-
-    unless Dir.exists? images_tf_dir_local
+    unless Dir.exist? images_tf_dir_local
       puts "Create TF records"
 
       convert_images images_source_dir: images_source_dir_local, images_conv_dir: images_conv_dir_local
