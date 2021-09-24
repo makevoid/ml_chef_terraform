@@ -27,14 +27,14 @@ end
 
 desc "Download data to local machine"
 task :download do
-  sh "scp -r #{USER}@#{VM_IP}:/home/#{USER}/data/output ../data/output"
+  sh "scp -r #{USER}@#{VM_IP}:/home/#{USER}/data/output ../data/output/"
 end
 
 RUN_ID = "00000-images_tf-mirror-stylegan2-gamma10-kimg1000-ada-bgc"
 
 desc "Download data to local machine - fakes images only"
 task :download_fakes do
-  sh "scp -r #{USER}@#{VM_IP}:/home/#{USER}/data/output/**/*.png ../data/output"
+  sh "scp -r #{USER}@#{VM_IP}:/home/#{USER}/data/output/**/*.png ../data/output/"
 end
 
 desc "Download data to local machine - latest model only"
@@ -43,7 +43,7 @@ task :download_model do
   model_file = `ssh #{USER}@#{VM_IP} ls -t #{dir_run}/*.pkl | head -1`
   model_file.strip!
   puts "executing: #{model_file}"
-  sh "scp -r #{USER}@#{VM_IP}:#{model_file} ../data/output"
+  sh "scp -r #{USER}@#{VM_IP}:#{model_file} ../data/output/"
 end
 
 
@@ -53,12 +53,12 @@ task :download_fake do
   model_file = `ssh #{USER}@#{VM_IP} ls -t #{dir_run}/*.png | head -1`
   model_file.strip!
   puts "executing: #{model_file}"
-  sh "scp -r #{USER}@#{VM_IP}:#{model_file} ../data/output"
+  sh "scp -r #{USER}@#{VM_IP}:#{model_file} ../data/output/"
 end
 
 desc "Download data to local machine - fakes images only"
 task :download_run_fakes do
-  sh "scp -r #{USER}@#{VM_IP}:/home/#{USER}/data/output/#{RUN_ID}r /*.png ../data/output"
+  sh "scp -r #{USER}@#{VM_IP}:/home/#{USER}/data/output/#{RUN_ID}r /*.png ../data/output/"
 end
 
 desc "Nvidia Stats"
