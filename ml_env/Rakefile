@@ -1,7 +1,7 @@
 PATH = File.expand_path "../", __FILE__
 
 # DEFAULT_IP = nil
-DEFAULT_IP = "207.53.234.147"
+DEFAULT_IP = "207.53.234.253"
 
 # USER = "ubuntu"
 USER = "user"
