@@ -26,5 +26,5 @@ resource "aws_security_group" "ec2-vms-nsg-1" {
   }
 
   #name   = "ec2-vms-nsg-1"
-  vpc_id = "vpc-8afcfce3"
+  vpc_id = "vpc-027327d44a2e85766"
 }

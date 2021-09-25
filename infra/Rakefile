@@ -1,6 +1,9 @@
 # TODO: extract into config
-VPC_ID = "vpc-8afcfce3"
-SUBNET_ID = "subnet-dd1be7b5"
+VPC_ID = "vpc-027327d44a2e85766"
+SUBNET_ID = "subnet-0726ebf699c06cdb9"
+
+# VPC_ID = "vpc-8afcfce3"
+# SUBNET_ID = "subnet-dd1be7b5"
 
 desc "Setup"
 task :setup do
@@ -12,12 +15,12 @@ end
 
 desc "Run"
 task :run do
-  sh "terraform plan"
+  sh "terraform plan --out plan.json"
 end
 
 desc "Apply"
 task :apply do
-  sh "terraform apply --auto-approve"
+  sh "terraform apply --auto-approve plan.json"
 end
 
 desc "Destroy"

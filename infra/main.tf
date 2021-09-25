@@ -1,5 +1,7 @@
 provider "aws" {
-  region = "eu-central-1"
+  # region  = "eu-central-1"
+  region  = "eu-west-1"
+  profile = "makevoid"
 }
 
 resource "aws_vpc" "vpc_default" {
