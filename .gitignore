@@ -5,3 +5,4 @@ data-*/*
 ml_env/.rake_tasks~
 *.swp
 .DS_Store
+plan.json
