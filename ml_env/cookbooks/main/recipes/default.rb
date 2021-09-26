@@ -2,8 +2,8 @@
 
 class Chef::Recipe
   module Constants
-    # USER = "ubuntu"
-    USER = "user"
+    USER = "ubuntu"
+    # USER = "user"
     DOCKER_USER = "stylegan2-ada"
   end
 

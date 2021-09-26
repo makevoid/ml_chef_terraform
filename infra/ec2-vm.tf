@@ -1,7 +1,14 @@
 resource "aws_instance" "ec2-vm-1" {
-  # Ubuntu 18 AWS ML AMI 
-  ami                         = "ami-0c4b99db370d5fd24"
-  availability_zone           = "eu-central-1a"
+  # Ubuntu 18 AWS ML AMI
+
+  # EU West (eu-west-1)
+  ami               = "ami-01084b03b72a330d9"
+  availability_zone = "eu-west-1a"
+
+  # EU Central (eu-central-1)
+  # ami                         = "ami-0c4b99db370d5fd24"
+  # availability_zone           = "eu-central-1a"
+
   associate_public_ip_address = "true"
 
   capacity_reservation_specification {

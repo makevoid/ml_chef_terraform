@@ -5,7 +5,10 @@ provider "aws" {
 }
 
 resource "aws_vpc" "vpc_default" {
-  cidr_block = "172.31.0.0/16"
+  # AWS
+  cidr_block = "10.0.0.0/16" # mkv
+  # cidr_block = "172.31.0.0/16" # old
+
   tags = {
     "Name" = "Training Budget VPC 1"
   }
@@ -15,7 +18,9 @@ resource "aws_vpc" "vpc_default" {
 }
 
 resource "aws_subnet" "default_subnet" {
-  cidr_block              = "172.31.0.0/20"
+  cidr_block = "10.0.0.0/24" # mkv
+  # cidr_block              = "172.31.0.0/20" # old
+
   vpc_id                  = aws_vpc.vpc_default.id
   map_public_ip_on_launch = true
   tags = {
