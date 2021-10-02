@@ -46,10 +46,10 @@ module MLUtils
   include Chef::Recipe::Constants
 
   TAG = "latest" # normal run
-  TAG = "resume1" # resume from previous model - requires you to build your custom stylegan2 image - repo with docker-compose.yml to do so here: https://github.com/makevoid/stylegan2-ada - command: docker-compose build && docker-compose push (requires a dockerhub account + docker login)
+  # TAG = "resume1" # resume from previous model - requires you to build your custom stylegan2 image - repo with docker-compose.yml to do so here: https://github.com/makevoid/stylegan2-ada - command: docker-compose build && docker-compose push (requires a dockerhub account + docker login)
 
   def nvidia_docker(command)
-    "nvidia-docker run -u $(id -u):$(id -g) -v /home/#{USER}/data:/home/#{DOCKER_USER}/data --device /dev/nvidia0:/dev/nvidia0 --device /dev/nvidiactl:/dev/nvidiactl makevoid/stylegan2:#{TAG} #{command}"
+    "nvidia-docker run -u $(id -u):$(id -g) -v /home/#{USER}/data:/home/#{DOCKER_USER}/data --device /dev/nvidia0:/dev/nvidia0 --device /dev/nvidiactl:/dev/nvidiactl -e TF_XLA_FLAGS=--tf_xla_cpu_global_jit makevoid/stylegan2:#{TAG} #{command}"
   end
   # nvidia-docker pull makevoid/stylegan2:latest
   # nvidia-docker pull makevoid/stylegan2:resume1
@@ -108,7 +108,7 @@ module MLModelUtils
   IMAGE_SIZE = "1024"
 
   # KIMG = "1000"
-  KIMG = "1000"
+  KIMG = "3000"
 
   # SNAPSHOTS = 2
   # GAMMA = 10
@@ -116,23 +116,38 @@ module MLModelUtils
 
   GPUS = 1
 
+  # AUG_ADA_TARGET = 0.85 # big increase
+  AUG_ADA_TARGET = 0.7 # recommeded increase
+  # AUG_ADA_TARGET = 0.6 # default
+  # AUG_ADA_TARGET = 0.35 # big decrease
+
   IMAGES_FILE_EXTENSION = "png"
   # IMAGES_FILE_EXTENSION = "jpg"
+
+  OUTPUT_FORMAT = "png"
+  # OUTPUT_FORMAT = "jpg"
 
   def create_tf_records(images_source_dir:, images_tf_dir:)
     python "dataset_tool.py", "create_from_images", images_tf_dir, images_source_dir
   end
 
+  #  -quality 100% -colorspace RGB -type TrueColor
+
   def convert_images(images_source_dir:, images_conv_dir:)
     ext = IMAGES_FILE_EXTENSION
     exe "mkdir -p #{images_conv_dir}"
-    exe "mogrify -format jpg -colorspace sRGB -type truecolor -resize #{IMAGE_SIZE}x#{IMAGE_SIZE}! -path #{images_conv_dir} #{images_source_dir}/*.#{ext}"
+    exe "mogrify -format #{OUTPUT_FORMAT} -resize #{IMAGE_SIZE}x#{IMAGE_SIZE}! -colorspace RGB -type TrueColor -path #{images_conv_dir} #{images_source_dir}/*.#{ext}"
+    # exe "cp #{images_source_dir} #{images_conv_dir}"
+  end
+
+  def pull_container
+    exe "sudo docker pull makevoid/stylegan2:#{MLUtils::TAG}"
   end
 
   def train(images_tf_dir:, output_dir:)
     # snap = "--snap #{SNAPSHOTS}"
     snap = ""
-    python "train.py", "--gpus #{GPUS}", "--outdir #{output_dir}", "--data #{images_tf_dir}", "--kimg #{KIMG} --cfg stylegan2 --metrics none --aug ada --augpipe bgc --gamma #{GAMMA} --mirror 1 #{snap}"
+    python "train.py", "--gpus #{GPUS}", "--outdir #{output_dir}", "--data #{images_tf_dir}", "--kimg #{KIMG} --cfg stylegan2 --metrics none --aug ada --augpipe bgc --gamma #{GAMMA} --mirror 1 #{snap}" # --target=#{AUG_ADA_TARGET}
   end
 end
 
@@ -165,6 +180,7 @@ ruby_block 'create TF records' do
       create_tf_records images_source_dir: images_conv_dir, images_tf_dir: images_tf_dir
     end
 
+    pull_container
     train images_tf_dir: images_tf_dir, output_dir: output_dir
   end
 end

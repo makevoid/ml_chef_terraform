@@ -1,6 +1,7 @@
 data/*
 data-bak/*
 data-*/*
+data */*
 *.tfstate
 ml_env/.rake_tasks~
 *.swp
