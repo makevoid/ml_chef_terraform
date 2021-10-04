@@ -104,8 +104,8 @@ end
 module MLModelUtils
   # IMAGE_SIZE = "128"
   # IMAGE_SIZE = "256"
-  # IMAGE_SIZE = "512"
-  IMAGE_SIZE = "1024"
+  IMAGE_SIZE = "512"
+  # IMAGE_SIZE = "1024"
 
   # KIMG = "1000"
   KIMG = "3000"
@@ -127,6 +127,12 @@ module MLModelUtils
   OUTPUT_FORMAT = "png"
   # OUTPUT_FORMAT = "jpg"
 
+  MIRROR = 0 # false
+  # MIRROR = 1
+
+  # AUGMENTATION_PIPE = "bgc" # aug_pipe
+  AUGMENTATION_PIPE = "bg" # aug_pipe
+
   def create_tf_records(images_source_dir:, images_tf_dir:)
     python "dataset_tool.py", "create_from_images", images_tf_dir, images_source_dir
   end
@@ -147,7 +153,7 @@ module MLModelUtils
   def train(images_tf_dir:, output_dir:)
     # snap = "--snap #{SNAPSHOTS}"
     snap = ""
-    python "train.py", "--gpus #{GPUS}", "--outdir #{output_dir}", "--data #{images_tf_dir}", "--kimg #{KIMG} --cfg stylegan2 --metrics none --aug ada --augpipe bgc --gamma #{GAMMA} --mirror 1 #{snap}" # --target=#{AUG_ADA_TARGET}
+    python "train.py", "--gpus #{GPUS}", "--outdir #{output_dir}", "--data #{images_tf_dir}", "--kimg #{KIMG} --cfg stylegan2 --metrics none --aug ada --augpipe #{AUGMENTATION_PIPE} --gamma #{GAMMA} --mirror #{MIRROR} #{snap}" # --target=#{AUG_ADA_TARGET}
   end
 end
 
