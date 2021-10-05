@@ -1,0 +1,57 @@
+# ---------------#
+# Configuration
+# ---------------#
+
+# VM IP
+# ---
+
+# note: root access is required
+
+# FluidStack VM's IP:
+default_ip: 207.53.234.134
+
+# StyleGAN2 - Chef parameters - main config
+# ---
+
+# image_size: "512"
+image_size: "1024"
+
+# NOTE: is recommended to not use a high number of kimg unless you're stopping manually - a
+# kimg: 300? - style-transfer batch
+# kimg: 1000 - small training batch
+# full training batch / interrupt batch manually (copy files out via `rake download_fakes && rake download_models` and run `rake reset_env`)
+kimg: 3000 - continue running until useful (and cost effective)
+
+# snapshots: 2
+
+# after you maxed out your gpu memory and system ram is stable - use lower gamma
+gamma: 10
+
+# number of GPUs - machine learning is expensive, try to keep this as 1 and do only transfer learning at first :D
+gpus: 1
+
+# aug_ada_target: 0.85 # big increase
+aug_ada_target: 0.7 # recommeded increase
+# aug_ada_target: 0.6 # default
+# aug_ada_target: 0.35 # big decrease
+
+images_file_extension: "png"
+# images_file_extension: "jpg"
+
+output_format: "png"
+# output_format: "jpg"
+
+mirror: 0 # false
+# mirror: 1
+
+# augmentation_pipe: "bgc" # aug_pipe
+augmentation_pipe: "bg" # aug_pipe
+
+
+# System config (do not change)
+# ---
+
+docker_user: stylegan-ada
+
+# fluidstack
+user: "user"

@@ -101,6 +101,7 @@ end
 desc "Delete data"
 task :delete_data do
   puts "Are you sure you want to delete data? (press Ctrl-C to stop or wait 10 seconds to delete the data - use reset env to stop stylegan2)"
+  sleep 10
   sh "ssh #{USER}@#{VM_IP} 'cd ./data && sudo rm -rf images_* output'"
 end
 
