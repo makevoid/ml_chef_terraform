@@ -8,8 +8,8 @@ class Chef::Recipe
     # NOTE: use ubuntu user for aws - check out the main branch of this repo
     # USER      = "ubuntu"  # AWS
 
-    TAG = "latest" # normal run
-    # TAG = "resume1" # resume from previous model - requires you to build your custom stylegan2 image - repo with docker-compose.yml to do so here: https://github.com/makevoid/stylegan2-ada - command: docker-compose build && docker-compose push (requires a dockerhub account + docker login)
+    # TAG = "latest" # normal run
+    TAG = "resume1" # resume from previous model - requires you to build your custom stylegan2 image - repo with docker-compose.yml to do so here: https://github.com/makevoid/stylegan2-ada - command: docker-compose build && docker-compose push (requires a dockerhub account + docker login)
 
     # test tag via ssh (`rake ssh`):
     # nvidia-docker pull makevoid/stylegan2:latest
@@ -77,8 +77,8 @@ module MLModelUtils
   IMAGES_FILE_EXTENSION = "png"
   # IMAGES_FILE_EXTENSION = "jpg"
 
-  # OUTPUT_FORMAT = "png"
-  OUTPUT_FORMAT = "jpg"
+  OUTPUT_FORMAT = "jpg" # NOTE: pass high quality jpgs
+  # OUTPUT_FORMAT = "png" # NOT RECOMMENDED (use this)
 
   MIRROR = 0 # false
   # MIRROR = 1
