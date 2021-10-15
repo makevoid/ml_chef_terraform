@@ -100,7 +100,7 @@ module MLModelUtils
     # extra_args << " +antialias "
     extra_args << " -quality 100% " # use for JPEG - 100% resolution
     # extra_args << " -fill '#d89f34' -colorize 7 "   # colorize
-    exe "mogrify -format #{OUTPUT_FORMAT} -adaptive-resize #{IMAGE_SIZE}x#{IMAGE_SIZE}! -colorspace sRGB -type TrueColor #{extra_args} -path #{images_conv_dir} #{images_source_dir}/*.#{ext}"
+    exe "mogrify -format #{OUTPUT_FORMAT} -adaptive-resize #{IMAGE_SIZE}x#{IMAGE_SIZE}! -colorspace sRGB -type TrueColor #{extra_args} -path #{images_conv_dir} #{images_source_dir}/*"
     # exe "cp #{images_source_dir} #{images_conv_dir}"
   end
 
