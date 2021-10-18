@@ -6,7 +6,7 @@ CHEF_VERSION = "21.8.555" # workstation version # chef version: "17.3.48"
 USER = "user" # fluidstack default user
 
 # DEFAULT_IP = nil
-DEFAULT_IP = "216.153.51.69"
+DEFAULT_IP = "216.153.51.150"
 
 def read_host_ip
   return DEFAULT_IP if DEFAULT_IP
