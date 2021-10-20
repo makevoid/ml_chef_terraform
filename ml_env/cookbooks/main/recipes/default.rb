@@ -80,8 +80,8 @@ module MLModelUtils
   OUTPUT_FORMAT = "jpg" # NOTE: pass high quality jpgs
   # OUTPUT_FORMAT = "png" # NOT RECOMMENDED (use this)
 
-  MIRROR = 0 # false
-  # MIRROR = 1
+  # MIRROR = 0 # false
+  MIRROR = 1
 
   AUGMENTATION_PIPE = "bgc" # aug_pipe  - default
   # AUGMENTATION_PIPE = "bg" # aug_pipe - ligher
