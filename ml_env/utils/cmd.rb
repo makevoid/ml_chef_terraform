@@ -48,9 +48,9 @@ module Cmd
   end
 
   def ssh_exe(cmd, stop: true, open3: true, quiet: false)
-    raise "NilHostError" unless HOST_IP
+    raise "NilHostError" unless VM_IP
     ssh_user = "#{USER}@"
-    exe "ssh -T #{ssh_user}#{HOST_IP} '#{cmd}'", stop: stop, open3: open3, quiet: quiet
+    exe "ssh -T #{ssh_user}#{VM_IP} '#{cmd}'", stop: stop, open3: open3, quiet: quiet
   end
 
   def ssh_file_exists(file_path)
@@ -64,7 +64,7 @@ module Cmd
 
   def rsync(target_dir:, local_dir:)
     ssh_user = "#{USER}@"
-    host = "#{ssh_user}#{HOST_IP}"
+    host = "#{ssh_user}#{VM_IP}"
     # TODO: add backup via `cp` in case you use this util and you rsync in the opposite direction :)
     rsync_status_ok = exe "rsync --no-whole-file --no-compress -r --inplace --delete --progress -e 'ssh -T -c aes128-gcm@openssh.com -o Compression=no -x ' --rsync-path=\"sudo rsync\" --exclude=\".git\" #{local_dir} #{host}:#{target_dir}"
     rsync_status_ok

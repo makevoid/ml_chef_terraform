@@ -4,12 +4,19 @@ RUN_ID = CONFIG.fetch "training_name"
 
 desc "Configure the ML env inside nvidia-docker"
 task :configure do
+  sh "echo 'training' > #{PATH}/tmp/state"
+  sh "ruby lib/ml_env_configure.rb"
+end
+
+desc "Generate - generate 3000 images from each model"
+task :generate do
+  sh "echo 'generation' > #{PATH}/tmp/state"
   sh "ruby lib/ml_env_configure.rb"
 end
 
 desc "ssh into the machine"
 task :ssh do
-  sh "ssh #{USER}@#{vm_ip}"
+  sh "ssh #{USER}@#{VM_IP}"
 end
 
 desc "Download data to local machine"
@@ -61,6 +68,9 @@ task :list do
   dir_out = "/home/#{USER}/data/output"
   sh "ssh #{USER}@#{VM_IP} ls #{dir_out}"
 end
+
+task download_generated: :download_fakes
+task download_generated: :download_fake
 
 desc "Reset Env - reset environment"
 task :reset_env do

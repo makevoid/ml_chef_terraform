@@ -51,7 +51,7 @@ class MLConfigurationManager
     puts " -" * 40
     # run chef-solo (chef-client, local mode) - recipes (-r) get cached - recipes overrides (-o) will skip cache
     recipe_args = "-r \"#{recipes_vendor.join ","}\" -o \"#{recipes.join ","}\""
-    ssh_exe "cd #{dir} && sudo #{chef_cli} #{recipe_args} -N #{HOST_IP}", stop: false
+    ssh_exe "cd #{dir} && sudo #{chef_cli} #{recipe_args} -N #{VM_IP}", stop: false
   end
 
   def install_berks_dependencies(dir:)
@@ -77,7 +77,7 @@ class MLConfigurationManager
   private
 
   def check_host
-    raise "HostNotPassedError" unless HOST_IP
+    raise "HostNotPassedError" unless VM_IP
   end
 
   def time_elapsed(start:)

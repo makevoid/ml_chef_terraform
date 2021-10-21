@@ -15,6 +15,60 @@ class Chef::Recipe
     # nvidia-docker pull makevoid/stylegan2:latest
     # nvidia-docker pull makevoid/stylegan2:resume1
 
+    # Stylegan2 parameters - TODO: load from Yaml config file
+
+    USER = "ubuntu"
+    PATH = "/home/#{USER}/provisioning"
+
+    state = File.read "#{PATH}/tmp/state"
+    state.strip!
+
+    STATE = :training   if state == "training"
+    STATE = :generation if state == "generation"
+    raise "StateNotFoundError - state: #{state.inspect}" unless STATE
+
+    load_config = -> {
+      YAML.load_file "#{PATH}/config/config.yml"
+    }
+
+    CONFIG = load_config.()
+
+    # Image Generation (model output generation)
+
+    IMAGE_GENERATION_SEEDS = "1000-4000"
+
+    # Training
+
+    # IMAGE_SIZE = "512"
+    IMAGE_SIZE = "1024"
+    IMAGE_SIZE_NEW = CONFIG.fetch "image_size"
+
+    # KIMG = "1000"
+    KIMG = "3000"
+
+    GAMMA = 10
+
+    # SNAPSHOTS = 2
+
+    GPUS = 1
+
+    # AUG_ADA_TARGET = 0.85   # big increase
+    AUG_ADA_TARGET = 0.7      # recommeded increase
+    # AUG_ADA_TARGET = 0.6    # default
+    # AUG_ADA_TARGET = 0.35   # big decrease
+
+    IMAGES_FILE_EXTENSION = "png"
+    # IMAGES_FILE_EXTENSION = "jpg"
+
+    OUTPUT_FORMAT = "jpg" # NOTE: pass high quality jpgs
+    # OUTPUT_FORMAT = "png" # NOT RECOMMENDED (use this)
+
+    # MIRROR = 0 # false
+    MIRROR = 1
+
+    AUGMENTATION_PIPE = "bgc" # aug_pipe  - default
+    # AUGMENTATION_PIPE = "bg" # aug_pipe - ligher
+
   end
 
   include Constants
@@ -57,34 +111,7 @@ include_recipe "main::module_ml_utils"
 
 # StyleGAN 2 model utils
 module MLModelUtils
-  # IMAGE_SIZE = "512"
-  IMAGE_SIZE = "1024"
-
-  # KIMG = "1000"
-  KIMG = "3000"
-
-  GAMMA = 10
-
-  # SNAPSHOTS = 2
-
-  GPUS = 1
-
-  # AUG_ADA_TARGET = 0.85   # big increase
-  AUG_ADA_TARGET = 0.7      # recommeded increase
-  # AUG_ADA_TARGET = 0.6    # default
-  # AUG_ADA_TARGET = 0.35   # big decrease
-
-  IMAGES_FILE_EXTENSION = "png"
-  # IMAGES_FILE_EXTENSION = "jpg"
-
-  OUTPUT_FORMAT = "jpg" # NOTE: pass high quality jpgs
-  # OUTPUT_FORMAT = "png" # NOT RECOMMENDED (use this)
-
-  # MIRROR = 0 # false
-  MIRROR = 1
-
-  AUGMENTATION_PIPE = "bgc" # aug_pipe  - default
-  # AUGMENTATION_PIPE = "bg" # aug_pipe - ligher
+  include Chef::Recipe::Constants
 
   def create_tf_records(images_source_dir:, images_tf_dir:)
     python "dataset_tool.py", "create_from_images", images_tf_dir, images_source_dir
@@ -105,13 +132,54 @@ module MLModelUtils
   end
 
   def pull_container
-    exe "sudo docker pull makevoid/stylegan2:#{MLUtils::TAG}"
+    exe "sudo docker pull makevoid/stylegan2:#{TAG}"
   end
 
   def train(images_tf_dir:, output_dir:)
     # snap = "--snap #{SNAPSHOTS}"
     snap = ""
+    puts "TRAINING"
     python "train.py", "--gpus #{GPUS}", "--outdir #{output_dir}", "--data #{images_tf_dir}", "--kimg #{KIMG} --cfg stylegan2 --metrics none --aug ada --augpipe #{AUGMENTATION_PIPE} --gamma #{GAMMA} --mirror #{MIRROR} #{snap}" # --target=#{AUG_ADA_TARGET}
+  end
+
+  # image generation
+
+  def list_models
+    models = []
+    model_paths = Dir.glob "#{PATH}/data/data/models/*.pkl"
+    model_paths.map do |model_path|
+      models << {
+        name:     File.basename(model_path),
+        name_pkl: File.basename(model_path, ".pkl"),
+        path:     model_path,
+      }
+    end
+    models
+  end
+
+  def generate_images(output_dir:)
+    models = list_models
+    generate_images_all_models models: models
+  end
+
+  def generate_images_all_models(models:)
+    models.each do |model|
+      generate_image_from_model model: model
+    end
+  end
+
+  def generate_image_from_model(model:)
+    generate_images_mkdir model: model
+    # call generate inside nvidia-docker stylegan container
+    model_name = model.fetch :name
+    puts "IMAGE GENERATION"
+    python "generate.py", "--outdir=/mnt/out", "--trunc=1", "--seeds=#{IMAGE_GENERATION_SEEDS}", "--network=/mnt/#{model_name}.pkl"
+  end
+
+  def generate_images_mkdir(model:)
+    model_name = model.fetch :name
+    dir = "#{PATH}/data/data/output/generated/#{model_name}/"
+    "mkdir -p #{dir}"
   end
 end
 
@@ -205,7 +273,13 @@ ruby_block 'TRAIN' do
 
     puts "-- Refresh docker container"
     pull_container
-    puts "-- Start Training"
-    train images_tf_dir: images_tf_dir, output_dir: output_dir
+    if STATE == :training
+      puts "-- Start Training"
+      train images_tf_dir: images_tf_dir, output_dir: output_dir
+    end
+    if STATE == :generation
+      puts "-- Start Image Generation"
+      generate_images output_dir: output_dir
+    end
   end
 end
