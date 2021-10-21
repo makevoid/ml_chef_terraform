@@ -1,7 +1,7 @@
 PATH = File.expand_path "../", __FILE__
 
-# RUN_ID = "00000-images_tf-mirror-stylegan2-gamma10-kimg3000-ada-bgc"
-RUN_ID = "00000-images_tf-stylegan2-gamma10-kimg3000-ada-bgc"
+RUN_ID = "00000-images_tf-mirror-stylegan2-gamma10-kimg3000-ada-bgc"
+# RUN_ID = "00000-images_tf-stylegan2-gamma10-kimg3000-ada-bgc"
 
 # RUN_ID = "00000-images_tf-mirror-stylegan2-gamma10-kimg3000-ada-target0.7-bgc"
 # RUN_ID = "00000-images_tf-mirror-stylegan2-gamma10-kimg3000-ada-target0.35-bgc"
