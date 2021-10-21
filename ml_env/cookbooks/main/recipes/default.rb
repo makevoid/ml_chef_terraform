@@ -10,6 +10,7 @@ class Chef::Recipe
 
     # TAG = "latest" # normal run
     TAG = "resume1" # resume from previous model - requires you to build your custom stylegan2 image - repo with docker-compose.yml to do so here: https://github.com/makevoid/stylegan2-ada - command: docker-compose build && docker-compose push (requires a dockerhub account + docker login)
+    TAG = "resume2"
 
     # test tag via ssh (`rake ssh`):
     # nvidia-docker pull makevoid/stylegan2:latest
@@ -19,6 +20,7 @@ class Chef::Recipe
 
     USER = "ubuntu"
     PATH = "/home/#{USER}/provisioning"
+    DATA_PATH = "/home/#{USER}/data/data"
 
     state = File.read "#{PATH}/tmp/state"
     state.strip!
@@ -145,19 +147,20 @@ module MLModelUtils
   # image generation
 
   def list_models
-    models = []
-    model_paths = Dir.glob "#{PATH}/data/data/models/*.pkl"
+    models_path = "#{DATA_PATH}/models/*.pkl"
+    puts "models path: #{models_path}"
+    model_paths = Dir.glob models_path
     model_paths.map do |model_path|
-      models << {
-        name:     File.basename(model_path),
-        name_pkl: File.basename(model_path, ".pkl"),
+      {
+        name:     File.basename(model_path, ".pkl"),
+        name_pkl: File.basename(model_path),
         path:     model_path,
       }
     end
-    models
   end
 
   def generate_images(output_dir:)
+    puts "generate images"
     models = list_models
     generate_images_all_models models: models
   end
@@ -169,17 +172,20 @@ module MLModelUtils
   end
 
   def generate_image_from_model(model:)
+    model_name = model.fetch :name
+    path       = "/home/#{DOCKER_USER}/data"
+    output_dir = "#{path}/output/#{model_name}"
+
     generate_images_mkdir model: model
     # call generate inside nvidia-docker stylegan container
-    model_name = model.fetch :name
     puts "IMAGE GENERATION"
-    python "generate.py", "--outdir=/mnt/out", "--trunc=1", "--seeds=#{IMAGE_GENERATION_SEEDS}", "--network=/mnt/#{model_name}.pkl"
+    python "generate.py", "--outdir=#{output_dir}", "--trunc=1", "--seeds=#{IMAGE_GENERATION_SEEDS}", "--network=#{path}/data/models/#{model_name}.pkl"
   end
 
   def generate_images_mkdir(model:)
     model_name = model.fetch :name
     dir = "#{PATH}/data/data/output/generated/#{model_name}/"
-    "mkdir -p #{dir}"
+    exe_async "mkdir -p #{dir}"
   end
 end
 
@@ -248,6 +254,29 @@ end
 # mogrify / convert tool
 apt_package "imagemagick"
 
+# docker
+apt_package "uidmap"
+
+# exe_async "curl https://get.docker.com | sh && sudo systemctl --now enable docker"
+#
+# exe_async "dockerd-rootless-setuptool.sh install"
+#
+# # TODO: export DOCKER_HOST
+# exe "DOCKER_HOST=unix:///run/user/1000/docker.sock docker ps"
+#
+# exe "sudo docker ps"
+#
+# # nvidia-docker
+# exe_async "distribution=$(. /etc/os-release;echo $ID$VERSION_ID) \
+#    && curl -s -L https://nvidia.github.io/nvidia-docker/gpgkey | sudo apt-key add - \
+#    && curl -s -L https://nvidia.github.io/nvidia-docker/$distribution/nvidia-docker.list | sudo tee /etc/apt/sources.list.d/nvidia-docker.list"
+#
+# apt_update
+#
+# apt_package "nvidia-docker2"
+
+# sudo systemctl restart docker
+#
 
 # Main recipe - terraform records
 
