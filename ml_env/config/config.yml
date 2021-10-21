@@ -22,7 +22,7 @@ image_size: "1024"
 # kimg: 300? - style-transfer batch
 # kimg: 1000 - small training batch
 # full training batch / interrupt batch manually (copy files out via `rake download_fakes && rake download_models` and run `rake reset_env`)
-kimg: 3000 - continue running until useful (and cost effective)
+kimg: 3000 # continue running until useful (and cost effective)
 
 # snapshots: 2
 
