@@ -5,13 +5,15 @@
 # VM IP
 # ---
 
-# note: root access is required
+# note: root access is required at the moment
 
 # FluidStack VM's IP:
-default_ip: 207.53.234.134
+vm_ip: 207.53.234.114
 
 # StyleGAN2 - Chef parameters - main config
 # ---
+
+training_name: "00000-images_tf-mirror-stylegan2-gamma10-kimg3000-ada-bgc"
 
 # image_size: "512"
 image_size: "1024"
@@ -41,12 +43,11 @@ images_file_extension: "png"
 output_format: "png"
 # output_format: "jpg"
 
-mirror: 0 # false
-# mirror: 1
+# mirror: 0 # false
+mirror: 1
 
 # augmentation_pipe: "bgc" # aug_pipe
 augmentation_pipe: "bg" # aug_pipe
-
 
 # System config (do not change)
 # ---
