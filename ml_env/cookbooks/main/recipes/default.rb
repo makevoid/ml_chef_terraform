@@ -19,7 +19,7 @@ class Chef::Recipe
     # Stylegan2 parameters - TODO: load from Yaml config file
 
     load_config = -> {
-      YAML.load_file "#{PATH}/config/config.yml"
+      YAML.load_file File.expand_path "~/config/config.yml"
     }
 
     CONFIG = load_config.()
