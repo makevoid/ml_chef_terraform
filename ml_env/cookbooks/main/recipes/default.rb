@@ -23,7 +23,7 @@ class Chef::Recipe
     # USER_TMP = "ubuntu" # aws and lambda
 
     load_config = -> {
-      YAML.load_file "/home/#{USER_TMP}/config/config.yml"
+      YAML.load_file "/home/#{USER_TMP}/provisioning/config/config.yml"
     }
 
     CONFIG = load_config.()
