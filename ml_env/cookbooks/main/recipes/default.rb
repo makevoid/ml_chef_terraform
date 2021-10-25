@@ -44,7 +44,7 @@ class Chef::Recipe
 
     # Image Generation (model output generation)
 
-    IMAGE_GENERATION_SEEDS = "1000-4000"
+    IMAGE_GENERATION_SEEDS = CONFIG.fetch "image_generation_seeds"
 
     # Training
 
