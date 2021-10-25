@@ -9,7 +9,7 @@
 
 # FluidStack VM's IP:
 # vm_ip: 207.53.234.114 # fuidstack
-vm_ip: 104.171.200.241 # lambda.com
+vm_ip: 104.171.200.117 # lambda.com
 
 vm_username: ubuntu # using lambda.com and the Ubuntu 18 AWS ML AMI
 # vm_username: user # fluidstack default user
