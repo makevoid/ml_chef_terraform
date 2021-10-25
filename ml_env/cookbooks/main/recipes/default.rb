@@ -18,8 +18,12 @@ class Chef::Recipe
 
     # Stylegan2 parameters - TODO: load from Yaml config file
 
+    # TODO: load user from yaml config file
+    USER_TMP = "user"   # FluidStack
+    # USER_TMP = "ubuntu" # aws and lambda
+
     load_config = -> {
-      YAML.load_file File.expand_path "~/config/config.yml"
+      YAML.load_file "/home/#{USER_TMP}/config/config.yml"
     }
 
     CONFIG = load_config.()
