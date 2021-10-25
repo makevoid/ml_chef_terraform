@@ -18,7 +18,14 @@ class Chef::Recipe
 
     # Stylegan2 parameters - TODO: load from Yaml config file
 
-    USER = "ubuntu"
+    load_config = -> {
+      YAML.load_file "#{PATH}/config/config.yml"
+    }
+
+    CONFIG = load_config.()
+
+    USER = CONFIG.fetch "vm_username"
+
     PATH = "/home/#{USER}/provisioning"
     DATA_PATH = "/home/#{USER}/data/data"
 
@@ -29,11 +36,7 @@ class Chef::Recipe
     STATE = :generation if state == "generation"
     raise "StateNotFoundError - state: #{state.inspect}" unless STATE
 
-    load_config = -> {
-      YAML.load_file "#{PATH}/config/config.yml"
-    }
 
-    CONFIG = load_config.()
 
     # Image Generation (model output generation)
 
