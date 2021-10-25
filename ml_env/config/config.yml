@@ -8,19 +8,18 @@
 # note: root access is required at the moment
 
 # FluidStack VM's IP:
-# vm_ip: 207.53.234.114 # fuidstack
-vm_ip: 104.171.200.117 # lambda.com
+vm_ip: 207.53.234.210
 
-vm_username: ubuntu # using lambda.com and the Ubuntu 18 AWS ML AMI
-# vm_username: user # fluidstack default user
+vm_username: user # fluidstack default user
+# vm_username: ubuntu # using lambda.com and the Ubuntu 18 AWS ML AMI
 
 # StyleGAN2 - Chef parameters - main config
 # ---
 
 training_name: "00000-images_tf-mirror-stylegan2-gamma10-kimg3000-ada-bgc"
 
-# image_size: "512"
 image_size: "1024"
+# image_size: "512"
 
 # NOTE: is recommended to not use a high number of kimg unless you're stopping manually - a
 # kimg: 300? - style-transfer batch
@@ -57,6 +56,3 @@ augmentation_pipe: "bg" # aug_pipe
 # ---
 
 docker_user: stylegan-ada
-
-# fluidstack
-user: "user"
