@@ -110,7 +110,7 @@ desc "Delete outputs"
 task :delete_outputs do
   puts "Are you sure you want to delete outputs? (press Ctrl-C to stop or wait 10 seconds to delete the outputs)"
   sleep 10
-  sh "ssh #{USER}@#{VM_IP} 'cd ./data && sudo rm -rf output'"
+  sh "ssh #{USER}@#{VM_IP} 'cd ./data && sudo rm -rf output models'"
 end
 
 task dl:  :download
