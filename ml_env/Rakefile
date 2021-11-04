@@ -113,6 +113,14 @@ task :delete_outputs do
   sh "ssh #{USER}@#{VM_IP} 'cd ./data && sudo rm -rf output models'"
 end
 
+
+desc "Stop training"
+task :stop_training do
+  puts "Are you sure you want to stop training? (press Ctrl-C to stop or wait 10 seconds for it to be reset)"
+  sleep 10
+  sh "ssh #{USER}@#{VM_IP} 'sudo docker kill $(sudo docker ps | grep stylegan2 | cut -d \" \" -f1)'"
+end
+
 task dl:  :download
 task log: :logs
 task ls:  :list
